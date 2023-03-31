@@ -34,7 +34,7 @@ class AbstractNodeProcessorTest extends TestCase
         $this->assertEquals($expectedResult, $nodeProcessor->isNode($nodePath));
     }
 
-    function isNodeDataProvider(): \Generator
+    public static function isNodeDataProvider(): \Generator
     {
         $nodeProcessor = new NodePathNodeProcessor();
         yield [$nodeProcessor->setNodePath('foo'),'foo', true];

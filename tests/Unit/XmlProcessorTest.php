@@ -23,7 +23,7 @@ class XmlProcessorTest extends TestCase
         self::assertInstanceOf(XmlProcessor::class, $xmlProcessor);
     }
 
-    public function testExecute()
+    public function testProcessFile()
     {
         $nodeProcessor = $this->getMockForAbstractClass(NodeProcessorInterface::class);
 
@@ -47,6 +47,6 @@ class XmlProcessorTest extends TestCase
             $nodeProcessor
         ]);
 
-        $xmlProcessor->execute(__DIR__ . '/../Fixtures/XmlProcessorTest/test.xml');
+        $xmlProcessor->processFile(__DIR__ . '/../Fixtures/XmlProcessorTest/test.xml');
     }
 }

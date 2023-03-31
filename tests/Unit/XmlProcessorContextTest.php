@@ -7,9 +7,18 @@ use PHPUnit\Framework\TestCase;
 
 class XmlProcessorContextTest extends TestCase
 {
+    /** @var NodeProcessorInterface */
+    static private $processor;
+
+    function setUp(): void
+    {
+        parent::setUp();
+        self::$processor = TestCase::getMockBuilder(NodeProcessorInterface::class)->getMock();
+    }
+
     function testGetXMLReader()
     {
-        $xmlReader = $this->getMockBuilder(\XMLReader::class)->getMock();
+        $xmlReader = $this->getXMLReaderMock();
         $context = new XmlProcessorContext($xmlReader, []);
         $this->assertSame($xmlReader, $context->getXMLReader());
     }
@@ -19,16 +28,18 @@ class XmlProcessorContextTest extends TestCase
      */
     function testGetProcessor($processor, $expected)
     {
-        $xmlReader = $this->getMockBuilder(\XMLReader::class)->getMock();
-        $context = new XmlProcessorContext($xmlReader, [$processor]);
+        $context = new XmlProcessorContext($this->getXMLReaderMock(), [$processor]);
         $this->assertSame($expected, $context->getProcessor(NodeProcessorInterface::class));
     }
 
-    function getProcessorDataProvider(): \Generator
+    public static function getProcessorDataProvider(): \Generator
     {
-        $processor = $this->getMockBuilder(NodeProcessorInterface::class)->getMock();
-        yield [$processor, $processor];
+        yield [self::$processor, self::$processor];
         yield [[], NULL];
+    }
 
+    private function getXMLReaderMock(): \XMLReader
+    {
+        return $this->getMockBuilder(\XMLReader::class)->getMock();
     }
 }
