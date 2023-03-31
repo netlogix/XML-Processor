@@ -1,18 +1,15 @@
 name: CI
 
-on: [push]
+on: [ push ]
 
 jobs:
-  build-test:
+  phpunit:
     runs-on: ubuntu-latest
-
+    matrix:
+      php: [ '7.4', '8.0', '8.1', '8.2' ]
     steps:
       - uses: actions/checkout@v3
       - uses: php-actions/composer@v6
       - uses: php-actions/phpunit@v3
         with:
-          coverage: "none"
-          configuration: "phpunit.xml"
-          php_version: "7.4"
-          phpunit_version: "9.5"
-          phpunit_args: "--coverage-clover=coverage.xml"
+          php_version: "${{ matrix.php }}"
