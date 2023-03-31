@@ -18,11 +18,6 @@ jobs:
         with:
           php-version: ${{ matrix.env.php }}
       - uses: actions/checkout@v3
-      - name: Cache Composer dependencies
-        uses: actions/cache@v3
-        with:
-          path: "/tmp/composer-cache-${{ matrix.env.php }}"
-          key: ${{ runner.os }}-${{ matrix.env.php }}-${{ hashFiles('composer.json') }}
       - uses: php-actions/composer@v6
         with:
           php_version: "${{ matrix.env.php }}"
