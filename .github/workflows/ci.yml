@@ -21,7 +21,7 @@ jobs:
       - name: Composer cache
         uses: actions/cache@v3
         with:
-          path: ${{ steps.composer-cache.outputs.dir }}
+          path: "/vendor"
           key: ${{ runner.os }}-${{ matrix.env.php }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.env.php }}-composer-
