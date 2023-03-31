@@ -10,6 +10,9 @@ use Netlogix\XmlProcessor\NodeProcessor\NodeProcessorInterface;
 
 class XmlProcessor
 {
+    const
+        EVENT_OPEN_FILE = 'openFile',
+        EVENT_END_OF_FILE = 'endOfFile';
     private array $nodePath = [];
     private string $currentValue = '';
 
@@ -23,19 +26,25 @@ class XmlProcessor
 
     /**
      * @param NodeProcessorInterface[] $processors
+     * @param bool[] $options
      */
     function __construct(
-        iterable $processors
+        iterable $processors,
+        iterable $options = []
     )
     {
         $this->xml = new \XMLReader();
+        foreach ($options as $option => $value) {
+            $this->xml->setParserProperty($option, $value);
+        }
         $this->processors = $processors;
         $this->context = new XmlProcessorContext($this->xml, $this->processors);
     }
 
-    function execute(string $filename)
+    function processFile(string $filename)
     {
         $this->xml->open($filename);
+        $this->getProcessorEvents(self::EVENT_OPEN_FILE);
         while ($this->xml->read()) {
             switch ($this->xml->nodeType) {
                 case \XMLReader::END_ELEMENT:
@@ -50,35 +59,41 @@ class XmlProcessor
                     break;
                 case \XMLReader::TEXT:
                     $this->eventTextElement();
+                    break;
+                default:
+                    $this->getProcessorEvents('NodeType_' . $this->xml->nodeType);
+                    break;
             }
         }
-        $this->eventEndOfFile();
+        $this->getProcessorEvents(self::EVENT_END_OF_FILE);
         $this->xml->close();
     }
 
     private function eventOpenElement()
     {
         $this->pushNodePath();
-        $this->runNodeTypeProcessors(\XMLReader::ELEMENT, OpenContext::class);
+        $this->getProcessorEvents('NodeType_' . \XMLReader::ELEMENT, OpenContext::class);
     }
 
     private function eventTextElement()
     {
         $this->currentValue = $this->xml->value;
-        $this->runNodeTypeProcessors(\XMLReader::TEXT, TextContext::class);
+        $this->getProcessorEvents('NodeType_' . \XMLReader::TEXT, TextContext::class);
     }
 
     private function eventCloseElement()
     {
-        $this->runNodeTypeProcessors(\XMLReader::END_ELEMENT, CloseContext::class);
+        $this->getProcessorEvents('NodeType_' . \XMLReader::END_ELEMENT, CloseContext::class);
         $this->popNodePath();
     }
 
-    private function eventEndOfFile()
+    private function getProcessorEvents(string $event, string $contextClass = NodeProcessorContext::class)
     {
-        foreach ($this->getProcessorForEvent('endOfFile') as $action) {
-            call_user_func($action);
+        $context = NULL;
+        foreach ($this->getProcessorForEvent($event) as $action) {
+            call_user_func($action, $context = $context ?? $this->createContext($contextClass));
         }
+        unset($context);
     }
 
     private function getProcessorForEvent(string $event): iterable
@@ -91,15 +106,6 @@ class XmlProcessor
                 }
             }
         }
-    }
-
-    private function runNodeTypeProcessors(string $type, string $contextClass)
-    {
-        $context = NULL;
-        foreach ($this->getProcessorForEvent('NodeType_' . $type) as $action) {
-            call_user_func($action, $context ?? $context = $this->createContext($contextClass));
-        }
-        unset($context);
     }
 
     private function getAttributes(): array
