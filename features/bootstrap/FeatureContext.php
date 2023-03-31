@@ -38,7 +38,7 @@ class FeatureContext implements Context
     {
         $fileName = tempnam(sys_get_temp_dir(), 'xmlprocessor');
         file_put_contents($fileName, $content->getRaw());
-        $this->xmlProcessor->execute($fileName);
+        $this->xmlProcessor->processFile($fileName);
     }
 
 
