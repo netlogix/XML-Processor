@@ -21,12 +21,12 @@ jobs:
       - name: Cache Composer dependencies
         uses: actions/cache@v3
         with:
-          path: /tmp/composer-cache
+          path: "/tmp/composer-cache-${{ matrix.env.php }}"
           key: ${{ runner.os }}-${{ matrix.env.php }}-${{ hashFiles('composer.json') }}
       - uses: php-actions/composer@v6
         with:
           php_version: "${{ matrix.env.php }}"
-          command: update
+          command: update -o --no-interaction --no-suggest --prefer-dist
       - uses: php-actions/phpunit@v3
         with:
           php_version: "${{ matrix.env.php }}"
