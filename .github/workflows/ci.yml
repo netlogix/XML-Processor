@@ -14,7 +14,14 @@ jobs:
           - { php: 8.2, version: 10 }
     steps:
       - uses: actions/checkout@v3
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: /tmp/composer-cache
+          key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
       - uses: php-actions/composer@v6
+        with:
+          php_version: "${{ matrix.env.php }}"
       - uses: php-actions/phpunit@v3
         with:
           php_version: "${{ matrix.env.php }}"
