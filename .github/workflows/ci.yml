@@ -18,6 +18,13 @@ jobs:
         with:
           php-version: ${{ matrix.env.php }}
       - uses: actions/checkout@v3
+      - name: Composer cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-${{ matrix.env.php }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.env.php }}-composer-
       - uses: php-actions/composer@v6
         with:
           php_version: "${{ matrix.env.php }}"
