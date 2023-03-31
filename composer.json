@@ -5,11 +5,11 @@
   "require": {
     "php": "^7.4 || ^8.0",
     "ext-xmlreader": "*",
-    "symfony/polyfill": "^1.27"
+    "symfony/polyfill": "^v1.27.0"
   },
   "require-dev": {
-    "behat/behat": "^3.8",
-    "phpunit/phpunit": "^9.0"
+    "behat/behat": "^3.12.0",
+    "phpunit/phpunit": "^9.6.6"
   },
   "autoload": {
     "psr-4": {
