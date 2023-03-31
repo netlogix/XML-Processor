@@ -1,18 +1,40 @@
 name: CI
 
-on: [push]
+on: [ push ]
 
 jobs:
-  build-test:
+  phpunit:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        env:
+          - { php: 7.4, phpunit: 9 }
+          - { php: 8.0, phpunit: 10 }
+          - { php: 8.1, phpunit: 10 }
+          - { php: 8.2, phpunit: 10 }
     steps:
       - uses: actions/checkout@v3
-      - uses: php-actions/composer@v6
+      - name: Composer cache
+        uses: actions/cache@v3
+        with:
+          path: "vendor"
+          key: ${{ runner.os }}-${{ matrix.env.php }}-composer-${{ hashFiles('composer.json') }}
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.env.php }}
+      - name: Update Composer
+        run: |
+          sudo composer self-update
+          composer --version
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+      - name: Install composer
+        run: composer install -o --no-interaction --no-suggest --prefer-dist
       - uses: php-actions/phpunit@v3
         with:
-          coverage: "none"
+          php_version: "${{ matrix.env.php }}"
+          version: "${{ matrix.env.phpunit }}"
           configuration: "phpunit.xml"
-          php_version: "7.4"
-          phpunit_version: "9.5"
-          phpunit_args: "--coverage-clover=coverage.xml"
+      - name: Run tests (Behat)
+        run: vendor/bin/behat -fprogress --strict
