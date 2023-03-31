@@ -27,3 +27,9 @@ jobs:
           php_version: "${{ matrix.env.php }}"
           version: "${{ matrix.env.version }}"
           configuration: "phpunit.xml"
+      - name: Run tests (Behat)
+        run: ./bin/behat -fprogress --strict
+
+      - name: Run tests (Behat for PHP 8.0)
+        if: matrix.php >= 8.0
+        run: ./bin/behat -fprogress --strict --tags=@php8
