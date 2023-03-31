@@ -32,9 +32,16 @@ class AbstractNodeProcessor implements NodeProcessorInterface
 
     function isNode(string $nodePath): bool
     {
-        if ('/' . $nodePath == $this->getNodePath()) {
+        $expected = $this->getNodePath();
+        if ('/' . $nodePath == $expected) {
             return true;
         }
-        return $nodePath === $this->getNodePath() || str_ends_with($nodePath, $this->getNodePath());
+
+        return $nodePath === $this->getNodePath()
+            || (
+            function_exists('str_end_with')
+                ? str_end_with($nodePath, $expected) :
+                substr_compare($nodePath, $expected, -strlen($expected)) === 0
+            );
     }
 }
