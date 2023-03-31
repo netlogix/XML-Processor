@@ -1,0 +1,25 @@
+{
+  "name": "netlogix/xml-processor",
+  "description": "PHP XML-Processor based on XMLReader",
+  "license": "MIT",
+  "require": {
+    "php": "^7.4 || ^8.0",
+    "ext-xmlreader": "*",
+    "symfony/polyfill": "^1.27"
+  },
+  "require-dev": {
+    "behat/behat": "^3.8",
+    "phpunit/phpunit": "^10.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Netlogix\\XmlProcessor\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Netlogix\\XmlProcessor\\Tests\\": "tests/",
+      "Netlogix\\XmlProcessor\\Behat\\": "features/"
+    }
+  }
+}
