@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Netlogix\XmlProcessor;
 
@@ -10,7 +11,7 @@ use Netlogix\XmlProcessor\NodeProcessor\NodeProcessorInterface;
 
 class XmlProcessor
 {
-    const
+    public const
         EVENT_OPEN_FILE = 'openFile',
         EVENT_END_OF_FILE = 'endOfFile';
     private array $nodePath = [];
@@ -21,14 +22,14 @@ class XmlProcessor
     private \XMLReader $xml;
     private XmlProcessorContext $context;
 
-    /** @var NodeProcessorInterface[] */
+    /** @var iterable<NodeProcessorInterface> */
     private iterable $processors;
 
     /**
-     * @param NodeProcessorInterface[] $processors
-     * @param bool[] $options
+     * @param iterable<NodeProcessorInterface> $processors
+     * @param iterable<bool> $options
      */
-    function __construct(
+    public function __construct(
         iterable $processors,
         iterable $options = []
     )
@@ -69,25 +70,25 @@ class XmlProcessor
         $this->xml->close();
     }
 
-    private function eventOpenElement()
+    private function eventOpenElement(): void
     {
         $this->pushNodePath();
         $this->getProcessorEvents('NodeType_' . \XMLReader::ELEMENT, OpenContext::class);
     }
 
-    private function eventTextElement()
+    private function eventTextElement(): void
     {
         $this->currentValue = $this->xml->value;
         $this->getProcessorEvents('NodeType_' . \XMLReader::TEXT, TextContext::class);
     }
 
-    private function eventCloseElement()
+    private function eventCloseElement(): void
     {
         $this->getProcessorEvents('NodeType_' . \XMLReader::END_ELEMENT, CloseContext::class);
         $this->popNodePath();
     }
 
-    private function getProcessorEvents(string $event, string $contextClass = NodeProcessorContext::class)
+    private function getProcessorEvents(string $event, string $contextClass = NodeProcessorContext::class): void
     {
         $context = NULL;
         foreach ($this->getProcessorForEvent($event) as $action) {
@@ -96,6 +97,9 @@ class XmlProcessor
         unset($context);
     }
 
+    /**
+     * @return iterable<callable>
+     */
     private function getProcessorForEvent(string $event): iterable
     {
         $nodePath = implode('/', $this->nodePath);
@@ -108,6 +112,9 @@ class XmlProcessor
         }
     }
 
+    /**
+     * @return array<string>
+     */
     private function getAttributes(): array
     {
         if ($this->attributes !== NULL) {
@@ -130,7 +137,7 @@ class XmlProcessor
         array_pop($this->nodePath);
     }
 
-    private function createContext($contextClass): NodeProcessorContext
+    private function createContext(string $contextClass): NodeProcessorContext
     {
         $context = new $contextClass($this->context, $this->nodePath);
         if (method_exists($context, 'setAttributes')) {

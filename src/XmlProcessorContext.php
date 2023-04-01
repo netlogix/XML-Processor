@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Netlogix\XmlProcessor;
 
@@ -7,15 +8,18 @@ use Netlogix\XmlProcessor\NodeProcessor\NodeProcessorInterface;
 class XmlProcessorContext
 {
     private \XMLReader $xml;
+    /**
+     * @var iterable<NodeProcessorInterface>
+     */
     private iterable $processors;
 
-    function __construct(\XMLReader $xml, iterable $processors)
+    public function __construct(\XMLReader $xml, iterable $processors)
     {
         $this->xml = $xml;
         $this->processors = $processors;
     }
 
-    function getProcessor(string $class): ?NodeProcessorInterface
+    public function getProcessor(string $class): ?NodeProcessorInterface
     {
         foreach ($this->processors as $processor) {
             if ($processor instanceof $class) {
@@ -25,7 +29,7 @@ class XmlProcessorContext
         return NULL;
     }
 
-    function getXMLReader(): \XMLReader
+    public function getXMLReader(): \XMLReader
     {
         return $this->xml;
     }

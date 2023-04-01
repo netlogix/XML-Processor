@@ -1,6 +1,7 @@
 <?php
+declare(strict_types=1);
 
-namespace Netlogix\XmlProcessor\NodeProcessor\Tests\Unit;
+namespace Netlogix\XmlProcessor\Tests\Unit\NodeProcessor;
 
 use Netlogix\XmlProcessor\NodeProcessor\AbstractNodeProcessor;
 use Netlogix\XmlProcessor\NodeProcessor\NodeProcessorInterface;
@@ -11,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 class AbstractNodeProcessorTest extends TestCase
 {
 
-    public function testGetNodePath()
+    public function testGetNodePath(): void
     {
         $nodeProcessor = new TestNodeProcessor();
         $this->assertEquals(TestNodeProcessor::NODE_PATH, $nodeProcessor->getNodePath());
@@ -21,7 +22,7 @@ class AbstractNodeProcessorTest extends TestCase
         $nodeProcessor->getNodePath();
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->markTestSkipped('ToDo: Implement testGetSubscribedEvents()');
     }
@@ -29,7 +30,7 @@ class AbstractNodeProcessorTest extends TestCase
     /**
      * @dataProvider isNodeDataProvider
      */
-    public function testIsNode(NodeProcessorInterface $nodeProcessor, string $nodePath, bool $expectedResult)
+    public function testIsNode(NodeProcessorInterface $nodeProcessor, string $nodePath, bool $expectedResult): void
     {
         $this->assertEquals($expectedResult, $nodeProcessor->isNode($nodePath));
     }
@@ -37,10 +38,10 @@ class AbstractNodeProcessorTest extends TestCase
     public static function isNodeDataProvider(): \Generator
     {
         $nodeProcessor = new NodePathNodeProcessor();
-        yield [$nodeProcessor->setNodePath('foo'),'foo', true];
-        yield [$nodeProcessor->setNodePath('foo'),'bar', false];
-        yield [$nodeProcessor->setNodePath('/foo'),'foo', true];
-        yield [$nodeProcessor->setNodePath('/foo'),'bar', false];
+        yield [$nodeProcessor->setNodePath('foo'), 'foo', true];
+        yield [$nodeProcessor->setNodePath('foo'), 'bar', false];
+        yield [$nodeProcessor->setNodePath('/foo'), 'foo', true];
+        yield [$nodeProcessor->setNodePath('/foo'), 'bar', false];
 
     }
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Netlogix\XmlProcessor\NodeProcessor;
 
@@ -6,12 +7,13 @@ use Netlogix\XmlProcessor\XmlProcessorContext;
 
 class AbstractNodeProcessor implements NodeProcessorInterface
 {
-    function getNodePath(): string
+    public function getNodePath(): string
     {
-        if (!defined(static::class . '::NODE_PATH')) {
+        $constName = get_class($this) . '::NODE_PATH';
+        if (!defined($constName)) {
             throw new \Exception('NODE_PATH not defined in ' . static::class);
         }
-        return static::NODE_PATH;
+        return constant($constName);
     }
 
     public function getSubscribedEvents(string $nodePath, XmlProcessorContext $context): \Iterator
@@ -30,10 +32,10 @@ class AbstractNodeProcessor implements NodeProcessorInterface
         yield from [];
     }
 
-    function isNode(string $nodePath): bool
+    public function isNode(string $nodePath): bool
     {
         $expected = $this->getNodePath();
-        if ('/' . $nodePath == $expected) {
+        if ($expected === '/' . $nodePath) {
             return true;
         }
 

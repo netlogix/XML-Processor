@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Netlogix\XmlProcessor;
 
@@ -16,7 +17,7 @@ class XmlProcessorContextTest extends TestCase
         self::$processor = TestCase::getMockBuilder(NodeProcessorInterface::class)->getMock();
     }
 
-    function testGetXMLReader()
+    function testGetXMLReader(): void
     {
         $xmlReader = $this->getXMLReaderMock();
         $context = new XmlProcessorContext($xmlReader, []);
@@ -26,7 +27,7 @@ class XmlProcessorContextTest extends TestCase
     /**
      * @dataProvider getProcessorDataProvider
      */
-    function testGetProcessor($processor, $expected)
+    function testGetProcessor($processor, $expected): void
     {
         $context = new XmlProcessorContext($this->getXMLReaderMock(), [$processor]);
         $this->assertSame($expected, $context->getProcessor(NodeProcessorInterface::class));
