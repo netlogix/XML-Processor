@@ -17,8 +17,6 @@ class XmlProcessor
     private array $nodePath = [];
     private string $currentValue = '';
 
-    private ?array $attributes = NULL;
-
     private \XMLReader $xml;
     private XmlProcessorContext $context;
 
@@ -42,7 +40,12 @@ class XmlProcessor
         $this->context = new XmlProcessorContext($this->xml, $this->processors);
     }
 
-    function processFile(string $filename)
+    function getProcessorContext(): XmlProcessorContext
+    {
+        return $this->context;
+    }
+
+    public function processFile(string $filename): void
     {
         $this->xml->open($filename);
         $this->getProcessorEvents(self::EVENT_OPEN_FILE);
@@ -117,14 +120,11 @@ class XmlProcessor
      */
     private function getAttributes(): array
     {
-        if ($this->attributes !== NULL) {
-            return $this->attributes;
-        }
-        $this->attributes = [];
+        $attributes = [];
         while ($this->xml->moveToNextAttribute()) {
-            $this->attributes[$this->xml->name] = $this->xml->value;
+            $attributes[$this->xml->name] = $this->xml->value;
         }
-        return $this->attributes;
+        return $attributes;
     }
 
     private function pushNodePath(): void
