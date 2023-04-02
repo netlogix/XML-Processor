@@ -44,19 +44,15 @@ class ArrayNodeProcessor implements NodeProcessorInterface, InvokeNodeProcessorI
             'children' => [],
         ];
         if (1 === $currentLevel && 1 === $this->currentLevel) {
-            echo "root: " . $context->getCurrentNodeName() . PHP_EOL;
             $newValue['parent'] = &$this->data;
             $this->data[] = &$newValue;
         } elseif ($currentLevel > $this->currentLevel) {
-            echo "next: " . $context->getCurrentNodeName() . PHP_EOL;
             $this->currentElement['children'][] = &$newValue;
             $newValue['parent'] = &$this->currentElement;
         } elseif ($currentLevel === $this->currentLevel) {
-            echo "current: " . $context->getCurrentNodeName() . PHP_EOL;
             $this->currentElement['parent']['children'][] = &$newValue;
             $newValue['parent'] = &$this->currentElement['parent'];
         } elseif ($currentLevel < $this->currentLevel) {
-            echo "parent: " . $context->getCurrentNodeName() . PHP_EOL;
             $this->currentElement['parent']['parent']['children'][] = &$newValue;
             $newValue['parent'] = &$this->currentElement['parent']['parent'];
         }
