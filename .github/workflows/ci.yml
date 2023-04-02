@@ -3,7 +3,7 @@ name: CI
 on: [ push ]
 
 jobs:
-  phpunit:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -31,10 +31,36 @@ jobs:
         run: composer validate
       - name: Install composer
         run: composer install -o --no-interaction --no-suggest --prefer-dist
-      - uses: php-actions/phpunit@v3
+
+      - name: PHPUnit tests
+        uses: php-actions/phpunit@v3
         with:
           php_version: "${{ matrix.env.php }}"
           version: "${{ matrix.env.phpunit }}"
           configuration: "phpunit.xml"
-      - name: Run tests (Behat)
-        run: vendor/bin/behat -fprogress --strict
+          php_extensions: "xdebug"
+          coverage_cobertura: "coverage.cobertura.xml"
+      - name: Code Coverage Report
+        if: { matrix.env.php } == '8.2'
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: coverage.cobertura.xml
+          badge: true
+          fail_below_min: true
+          format: markdown
+          hide_branch_rate: false
+          hide_complexity: true
+          indicators: true
+          output: both
+          thresholds: '60 80'
+      - name: Add Coverage PR Comment
+        if: { matrix.env.php } == '8.2' && github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          path: code-coverage-results.md
+
+      - name: Behat tests
+        uses: php-actions/behat@master
+        with:
+          php_version: "${{ matrix.env.php }}"
