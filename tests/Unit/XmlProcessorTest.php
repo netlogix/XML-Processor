@@ -10,6 +10,7 @@ use Netlogix\XmlProcessor\NodeProcessor\NodeProcessorInterface;
 use Netlogix\XmlProcessor\NodeProcessor\OpenNodeProcessorInterface;
 use Netlogix\XmlProcessor\NodeProcessor\TextNodeProcessorInterface;
 use Netlogix\XmlProcessor\XmlProcessor;
+use Netlogix\XmlProcessor\XmlProcessorContext;
 use PHPUnit\Framework\TestCase;
 
 
@@ -21,6 +22,15 @@ class XmlProcessorTest extends TestCase
             $this->getMockForAbstractClass(NodeProcessorInterface::class)
         ]);
         self::assertInstanceOf(XmlProcessor::class, $xmlProcessor);
+    }
+
+    public function testGetProcessorContext(): void
+    {
+        $xmlProcessor = new XmlProcessor([
+            $this->getMockForAbstractClass(NodeProcessorInterface::class)
+        ]);
+        $context = $xmlProcessor->getProcessorContext();
+        self::assertInstanceOf(XmlProcessorContext::class, $context);
     }
 
     public function testProcessFile()
