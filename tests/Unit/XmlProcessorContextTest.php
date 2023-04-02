@@ -17,6 +17,12 @@ class XmlProcessorContextTest extends TestCase
         self::$processor = TestCase::getMockBuilder(NodeProcessorInterface::class)->getMock();
     }
 
+    function test__construct(): void
+    {
+        $context = new XmlProcessorContext($this->getXMLReaderMock(), []);
+        $this->assertInstanceOf(XmlProcessorContext::class, $context);
+    }
+
     function testGetXMLReader(): void
     {
         $xmlReader = $this->getXMLReaderMock();
