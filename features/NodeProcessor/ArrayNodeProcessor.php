@@ -45,16 +45,18 @@ class ArrayNodeProcessor implements NodeProcessorInterface, InvokeNodeProcessorI
         ];
         if (1 === $currentLevel && 1 === $this->currentLevel) {
             $newValue['parent'] = &$this->data;
-            $this->data[] = &$newValue;
         } elseif ($currentLevel > $this->currentLevel) {
-            $this->currentElement['children'][] = &$newValue;
             $newValue['parent'] = &$this->currentElement;
         } elseif ($currentLevel === $this->currentLevel) {
-            $this->currentElement['parent']['children'][] = &$newValue;
             $newValue['parent'] = &$this->currentElement['parent'];
         } elseif ($currentLevel < $this->currentLevel) {
-            $this->currentElement['parent']['parent']['children'][] = &$newValue;
             $newValue['parent'] = &$this->currentElement['parent']['parent'];
+        }
+
+        if (1 === $currentLevel) {
+            $this->data[] =  &$newValue;
+        } else {
+            $newValue['parent']['children'][] = &$newValue;
         }
         $this->currentElement = &$newValue;
         $this->currentLevel = $currentLevel;

@@ -1,7 +1,7 @@
 Feature: run XMLProcessor with TextNodeProcessor
 
   Scenario: run XMLProcessor
-    Given initialize XMLProcessor with "Netlogix\XmlProcessor\Behat\NodeProcessor\TextNodeProcess"
+    Given initialize XMLProcessor with "Netlogix\XmlProcessor\Behat\NodeProcessor\TextNodeProcessor"
     When process xml with current XMLProcessor instance:
       """
       <root>
@@ -9,7 +9,7 @@ Feature: run XMLProcessor with TextNodeProcessor
         <test>bar</test>
       </root>
       """
-    Then NodeProcessor "Netlogix\XmlProcessor\Behat\NodeProcessor\TextNodeProcess" should return:
+    Then NodeProcessor "Netlogix\XmlProcessor\Behat\NodeProcessor\TextNodeProcessor" should return:
       """
       [
         "foo",
