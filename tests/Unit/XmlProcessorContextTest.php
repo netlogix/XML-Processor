@@ -1,0 +1,52 @@
+<?php
+declare(strict_types=1);
+
+namespace Netlogix\XmlProcessor;
+
+use Netlogix\XmlProcessor\NodeProcessor\NodeProcessorInterface;
+use PHPUnit\Framework\TestCase;
+
+class XmlProcessorContextTest extends TestCase
+{
+    /** @var NodeProcessorInterface */
+    static private $processor;
+
+    function setUp(): void
+    {
+        parent::setUp();
+        self::$processor = TestCase::getMockBuilder(NodeProcessorInterface::class)->getMock();
+    }
+
+    function test__construct(): void
+    {
+        $context = new XmlProcessorContext($this->getXMLReaderMock(), []);
+        $this->assertInstanceOf(XmlProcessorContext::class, $context);
+    }
+
+    function testGetXMLReader(): void
+    {
+        $xmlReader = $this->getXMLReaderMock();
+        $context = new XmlProcessorContext($xmlReader, []);
+        $this->assertSame($xmlReader, $context->getXMLReader());
+    }
+
+    /**
+     * @dataProvider getProcessorDataProvider
+     */
+    function testGetProcessor($processor, $expected): void
+    {
+        $context = new XmlProcessorContext($this->getXMLReaderMock(), [$processor]);
+        $this->assertSame($expected, $context->getProcessor(NodeProcessorInterface::class));
+    }
+
+    public static function getProcessorDataProvider(): \Generator
+    {
+        yield [self::$processor, self::$processor];
+        yield [[], NULL];
+    }
+
+    private function getXMLReaderMock(): \XMLReader
+    {
+        return $this->getMockBuilder(\XMLReader::class)->getMock();
+    }
+}
