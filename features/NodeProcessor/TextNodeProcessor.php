@@ -4,12 +4,10 @@ declare(strict_types=1);
 namespace Netlogix\XmlProcessor\Behat\NodeProcessor;
 
 use Netlogix\XmlProcessor\NodeProcessor\AbstractNodeProcessor;
-use Netlogix\XmlProcessor\NodeProcessor\Context\OpenContext;
 use Netlogix\XmlProcessor\NodeProcessor\Context\TextContext;
-use Netlogix\XmlProcessor\NodeProcessor\OpenNodeProcessorInterface;
 use Netlogix\XmlProcessor\NodeProcessor\TextNodeProcessorInterface;
 
-class TextNodeProcess extends AbstractNodeProcessor implements TextNodeProcessorInterface, InvokeNodeProcessorInterface
+class TextNodeProcessor extends AbstractNodeProcessor implements TextNodeProcessorInterface, InvokeNodeProcessorInterface
 {
     public const NODE_PATH = 'test';
 
