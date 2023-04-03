@@ -49,7 +49,7 @@ For easier use, you can extend the [`AbstractNodeProcessor`] class and implement
 
 ## Example
 
-To extract all values of `<test>` nodes of the following XML:
+To extract all values of `<value>` nodes of the following XML:
 
 **file.xml**
 
