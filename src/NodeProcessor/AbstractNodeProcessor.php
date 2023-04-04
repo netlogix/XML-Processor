@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Netlogix\XmlProcessor\NodeProcessor;
 
+use Netlogix\XmlProcessor\XmlProcessor;
 use Netlogix\XmlProcessor\XmlProcessorContext;
 
 class AbstractNodeProcessor implements NodeProcessorInterface
@@ -34,16 +35,6 @@ class AbstractNodeProcessor implements NodeProcessorInterface
 
     public function isNode(string $nodePath): bool
     {
-        $expected = $this->getNodePath();
-        if ($expected === '/' . $nodePath) {
-            return true;
-        }
-
-        return $nodePath === $this->getNodePath()
-            || (
-            function_exists('str_end_with')
-                ? str_end_with($nodePath, $expected) :
-                substr_compare($nodePath, $expected, -strlen($expected)) === 0
-            );
+        return XmlProcessor::checkNodePath($nodePath, $this->getNodePath());
     }
 }

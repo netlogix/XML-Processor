@@ -1,4 +1,8 @@
 <?xml version='1.0'?>
 <root foo="bar">
-    hallo
+    <foo>
+        <bar>text</bar>
+    </foo>
+    <baz>hallo</baz>
+    <br/>
 </root>

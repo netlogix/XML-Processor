@@ -1,9 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace Netlogix\XmlProcessor\Tests\Unit\Behat\NodeProcessor;
 
 use Netlogix\XmlProcessor\Behat\NodeProcessor\ArrayNodeProcessor;
 use Netlogix\XmlProcessor\NodeProcessor\Context\OpenContext;
+use Netlogix\XmlProcessor\NodeProcessor\Context\TextContext;
 use Netlogix\XmlProcessor\XmlProcessorContext;
 use PHPUnit\Framework\TestCase;
 
@@ -39,10 +41,12 @@ class ArrayNodeProcessorTest extends TestCase
             [
                 'nodePath' => ['foo', 'bar'],
                 'attributes' => ['name' => 'me'],
+                'text' => 'test'
             ],
             [
                 'nodePath' => ['foo', 'bar'],
                 'attributes' => ['name' => 'you'],
+                'text' => 'test2'
             ],
             [
                 'nodePath' => ['foo'],
@@ -57,6 +61,11 @@ class ArrayNodeProcessorTest extends TestCase
             $context = new OpenContext($xmlProcessorContext, $item['nodePath']);
             $context->setAttributes($item['attributes']);
             $nodeProcessor->openElement($context);
+            if (isset($item['text'])) {
+                $textContext = new TextContext($xmlProcessorContext, $item['nodePath']);
+                $textContext->setText($item['text']);
+                $nodeProcessor->textElement($textContext);
+            }
         }
 
         self::assertEquals([
@@ -70,12 +79,14 @@ class ArrayNodeProcessorTest extends TestCase
                         'level' => 2,
                         'attributes' => ['name' => 'me'],
                         'children' => [],
+                        'text' => 'test'
                     ],
                     [
                         'node' => 'bar',
                         'level' => 2,
                         'attributes' => ['name' => 'you'],
                         'children' => [],
+                        'text' => 'test2'
                     ],
                 ],
 

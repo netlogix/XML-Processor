@@ -17,37 +17,57 @@ class XmlProcessor
     private array $nodePath = [];
     private string $currentValue = '';
 
+    private ?array $skipNodes = NULL;
+
     private \XMLReader $xml;
     private XmlProcessorContext $context;
 
     /** @var iterable<NodeProcessorInterface> */
     private iterable $processors;
 
+    /** @var iterable<bool> */
+    private iterable $parserProperties;
+
     /**
      * @param iterable<NodeProcessorInterface> $processors
-     * @param iterable<bool> $options
+     * @param iterable<bool> $parserProperties
      */
     public function __construct(
         iterable $processors,
-        iterable $options = []
+        iterable $parserProperties = []
     )
     {
         $this->xml = new \XMLReader();
-        foreach ($options as $option => $value) {
-            $this->xml->setParserProperty($option, $value);
-        }
         $this->processors = $processors;
-        $this->context = new XmlProcessorContext($this->xml, $this->processors);
+        $this->parserProperties = $parserProperties;
+        $this->context = new XmlProcessorContext(
+            $this->xml,
+            $this->processors,
+            fn() => $this->skipNode()
+        );
     }
 
-    function getProcessorContext(): XmlProcessorContext
+    function setSkipNodes(?array $skipNodes = NULL): void
     {
-        return $this->context;
+        $this->skipNodes = $skipNodes;
+    }
+
+    function getSkipNodes(): ?array
+    {
+        return $this->skipNodes;
+    }
+
+    function getProcessor(string $processorName): ?NodeProcessorInterface
+    {
+        return $this->context->getProcessor($processorName);
     }
 
     public function processFile(string $filename): void
     {
         $this->xml->open($filename);
+        foreach ($this->parserProperties as $parserProperty => $value) {
+            $this->xml->setParserProperty($parserProperty, $value);
+        }
         $this->getProcessorEvents(self::EVENT_OPEN_FILE);
         while ($this->xml->read()) {
             switch ($this->xml->nodeType) {
@@ -57,6 +77,10 @@ class XmlProcessor
                 case \XMLReader::ELEMENT:
                     $selfClosing = $this->xml->isEmptyElement;
                     $this->eventOpenElement();
+                    if ($this->shouldSkipNode()) {
+                        $this->skipNode();
+                        break;
+                    }
                     if ($selfClosing) {
                         $this->eventCloseElement();
                     }
@@ -71,6 +95,28 @@ class XmlProcessor
         }
         $this->getProcessorEvents(self::EVENT_END_OF_FILE);
         $this->xml->close();
+    }
+
+    private function skipNode(): bool
+    {
+        $result = $this->xml->next();
+        $this->eventCloseElement();
+        return $result;
+    }
+
+    private function shouldSkipNode(): bool
+    {
+        if ($this->skipNodes === NULL) {
+            return false;
+        }
+        $nodePath = implode('/', $this->nodePath);
+        foreach ($this->skipNodes as $skipNode) {
+            if (self::checkNodePath($nodePath, $skipNode)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function eventOpenElement(): void
@@ -147,5 +193,16 @@ class XmlProcessor
             $context->setText($this->currentValue);
         }
         return $context;
+    }
+
+    static function checkNodePath(string $nodePath, string $expected): bool
+    {
+        return
+            $expected === '/' . $nodePath ||
+            $nodePath === $expected || (
+            function_exists('str_end_with')
+                ? str_end_with($nodePath, $expected) :
+                substr_compare($nodePath, $expected, -strlen($expected)) === 0
+            );
     }
 }
