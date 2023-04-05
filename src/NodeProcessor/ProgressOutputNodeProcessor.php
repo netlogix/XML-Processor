@@ -46,10 +46,6 @@ class ProgressOutputNodeProcessor implements NodeProcessorInterface, OpenNodePro
         if ($this->progressBar !== NULL) {
             $this->progressBar->finish();
         }
-        if($this->output === NULL) {
-            $this->progressBar = NULL;
-            return;
-        }
         $this->progressBar = $this->progressBarFactory->createProgressBar($this->output);
     }
 

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Netlogix\XmlProcessor\Tests\Unit\NodeProcessor;
 
+use Netlogix\XmlProcessor\Factory\NodeProcessorProgressBarFactory;
 use Netlogix\XmlProcessor\NodeProcessor\Context\OpenContext;
 use Netlogix\XmlProcessor\NodeProcessor\ProgressOutputNodeProcessor;
 use Netlogix\XmlProcessor\XmlProcessor;
@@ -13,6 +14,15 @@ use Symfony\Component\Console\Output\ConsoleOutputInterface;
 
 class ProgressOutputNodeProcessorTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $reflectionClass = new \ReflectionClass(ProgressOutputNodeProcessor::class);
+        $this->progressBarProperty = $reflectionClass->getProperty('progressBar');
+        $this->progressBarProperty->setAccessible(true);
+    }
+
     public function test__construct(): void
     {
         $nodeProcessor = new ProgressOutputNodeProcessor();
@@ -21,7 +31,11 @@ class ProgressOutputNodeProcessorTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        $nodeProcessor = new ProgressOutputNodeProcessor();
+        $progressBarFactory = $this::getMockBuilder(NodeProcessorProgressBarFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $progressBarFactory->method('createProgressBar')->willReturn($this->createMock(ProgressBar::class));
+        $nodeProcessor = new ProgressOutputNodeProcessor($progressBarFactory);
         $context = $this->getMockBuilder(XmlProcessorContext::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -33,8 +47,7 @@ class ProgressOutputNodeProcessorTest extends TestCase
             iterator_to_array($nodeProcessor->getSubscribedEvents('test', $context))
         );
 
-        $output = $this::getMockForAbstractClass(ConsoleOutputInterface::class);
-        $nodeProcessor->setOutput($output);
+        $nodeProcessor->setOutput($this->getOutputMock());
         $nodeProcessor->openFile();
 
         self::assertEquals(
@@ -48,49 +61,73 @@ class ProgressOutputNodeProcessorTest extends TestCase
 
     public function testOpenFile(): void
     {
-        $reflectionClass = new \ReflectionClass(ProgressOutputNodeProcessor::class);
-
         $nodeProcessor = new ProgressOutputNodeProcessor();
         $nodeProcessor->openFile();
-        self::assertNull($reflectionClass->getProperty('progressBar')->getValue($nodeProcessor));
+        self::assertNull($this->progressBarProperty->getValue($nodeProcessor));
 
-        $output = $this::getMockForAbstractClass(ConsoleOutputInterface::class);
-        $nodeProcessor->setOutput($output);
+        $progressBar = $this->getMockBuilder(ProgressBar::class)->disableOriginalConstructor()
+            ->getMock();
+        $progressBar->expects($this->once())->method('finish');
+        $progressBarFactory = $this::getMockBuilder(NodeProcessorProgressBarFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $progressBarFactory->method('createProgressBar')->willReturn($progressBar);
+
+        $nodeProcessor = new ProgressOutputNodeProcessor($progressBarFactory);
+        $nodeProcessor->setOutput($this->getOutputMock());
         $nodeProcessor->openFile();
-        self::assertInstanceOf(ProgressBar::class, $reflectionClass->getProperty('progressBar')->getValue($nodeProcessor));
+        self::assertInstanceOf(ProgressBar::class, $this->progressBarProperty->getValue($nodeProcessor));
 
         self::markTestIncomplete('ToDo: $this->progressBar->finish()');
     }
 
     public function testOpenElement(): void
     {
-        $nodeProcessor = new ProgressOutputNodeProcessor();
-        $output = $this::getMockForAbstractClass(ConsoleOutputInterface::class);
-        $nodeProcessor->setOutput($output);
+
+        $progressBar = $this->getMockBuilder(ProgressBar::class)->disableOriginalConstructor()
+            ->getMock();
+
+        $progressBar->expects($this->once())->method('advance')->with(1);
+        $progressBar->expects($this->once())->method('setMessage')->with('foo/bar', 'node');
+        $progressBarFactory = $this::getMockBuilder(NodeProcessorProgressBarFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $progressBarFactory->method('createProgressBar')->willReturn($progressBar);
+
+        $nodeProcessor = new ProgressOutputNodeProcessor($progressBarFactory);
+        $nodeProcessor->setOutput($this->getOutputMock());
         $nodeProcessor->openFile();
 
         $openContext = $this->createMock(OpenContext::class);
         $openContext->method('getNodePath')->willReturn('foo/bar');
 
         $nodeProcessor->openElement($openContext);
-        $reflectionClass = new \ReflectionClass($nodeProcessor);
-
-        /** @var ProgressBar $progressBar */
-        $progressBar = $reflectionClass->getProperty('progressBar')->getValue($nodeProcessor);
-        self::assertEquals(1, $progressBar->getProgress());
-        self::assertEquals('foo/bar', $progressBar->getMessage('node'));
     }
 
     function testEndOfFile(): void
     {
-        $nodeProcessor = new ProgressOutputNodeProcessor();
-        $output = $this::getMockForAbstractClass(ConsoleOutputInterface::class);
-        $nodeProcessor->setOutput($output);
+        $progressBar = $this->getMockBuilder(ProgressBar::class)->disableOriginalConstructor()
+            ->getMock();
+        $progressBar->expects($this->once())->method('finish');
+        $progressBarFactory = $this::getMockBuilder(NodeProcessorProgressBarFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $progressBarFactory->method('createProgressBar')->willReturn($progressBar);
+
+        $nodeProcessor = new ProgressOutputNodeProcessor($progressBarFactory);
+        $nodeProcessor->setOutput($this->getOutputMock());
         $nodeProcessor->openFile();
 
         $nodeProcessor->endOfFile();
-        $reflectionClass = new \ReflectionClass($nodeProcessor);
-        $progressBar = $reflectionClass->getProperty('progressBar');
+        $progressBar = $this->progressBarProperty;
         self::assertNull($progressBar->getValue($nodeProcessor));
+    }
+
+    private function getOutputMock(): ConsoleOutputInterface
+    {
+        $output = $this::getMockForAbstractClass(ConsoleOutputInterface::class);
+        $output->method('getErrorOutput')->willReturn($output);
+        $output->method('isDecorated')->willReturn(true);
+        return $output;
     }
 }

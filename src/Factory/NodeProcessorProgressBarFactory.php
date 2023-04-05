@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class NodeProcessorProgressBarFactory
 {
-    public function createProgressBar(OutputInterface $output): ?ProgressBar
+    public function createProgressBar(?OutputInterface $output = NULL): ?ProgressBar
     {
         if (!($output instanceof ConsoleOutputInterface)) {
             return NULL;
