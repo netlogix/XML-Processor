@@ -41,6 +41,14 @@ class FeatureContext implements Context
     }
 
     /**
+     * @When set skipNode to:
+     */
+    public function iSetSkipNode(PyStringNode $skipNode): void
+    {
+        $this->xmlProcessor->setSkipNodes($skipNode->getStrings());
+    }
+
+    /**
      * @Then NodeProcessor :nodeProcessorClass should return:
      */
     function nodeProcessorShouldReturn(string $nodeProcessorClass, PyStringNode $content): void
@@ -52,7 +60,7 @@ class FeatureContext implements Context
             throw new \Exception(sprintf('Class %s does not extend %s', $nodeProcessorClass, NodeProcessorInterface::class));
         }
         /** @var InvokeNodeProcessorInterface $nodeProcessor */
-        $nodeProcessor = $this->xmlProcessor->getProcessorContext()->getProcessor($nodeProcessorClass);
+        $nodeProcessor = $this->xmlProcessor->getProcessor($nodeProcessorClass);
         $expected = json_decode($content->getRaw(), true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \Exception(sprintf('Could not decode expected result: %s', json_last_error_msg()));
