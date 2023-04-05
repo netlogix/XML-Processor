@@ -2,7 +2,6 @@
 
 namespace Netlogix\XmlProcessor\Tests\Unit\NodeProcessor\Context;
 
-use Netlogix\XmlProcessor\NodeProcessor\Context\NodeProcessorContext;
 use Netlogix\XmlProcessor\NodeProcessor\Context\OpenContext;
 use Netlogix\XmlProcessor\XmlProcessorContext;
 use PHPUnit\Framework\TestCase;

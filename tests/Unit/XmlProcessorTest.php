@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Netlogix\XmlProcessor\Tests\Unit;
 
@@ -9,28 +10,33 @@ use Netlogix\XmlProcessor\NodeProcessor\Context\TextContext;
 use Netlogix\XmlProcessor\NodeProcessor\NodeProcessorInterface;
 use Netlogix\XmlProcessor\NodeProcessor\OpenNodeProcessorInterface;
 use Netlogix\XmlProcessor\NodeProcessor\TextNodeProcessorInterface;
+use Netlogix\XmlProcessor\Tests\Fixtures\AbstractNodeProcessorTest\TestNodeProcessor;
 use Netlogix\XmlProcessor\XmlProcessor;
-use Netlogix\XmlProcessor\XmlProcessorContext;
 use PHPUnit\Framework\TestCase;
-
 
 class XmlProcessorTest extends TestCase
 {
     public function test__construct()
     {
-        $xmlProcessor = new XmlProcessor([
-            $this->getMockForAbstractClass(NodeProcessorInterface::class)
-        ]);
+        $xmlProcessor = new XmlProcessor(
+            [
+                $this->getMockForAbstractClass(NodeProcessorInterface::class)
+            ],
+            [
+                \XMLReader::SUBST_ENTITIES => true
+            ]
+        );
         self::assertInstanceOf(XmlProcessor::class, $xmlProcessor);
     }
 
-    public function testGetProcessorContext(): void
+    public function testGetProcessor(): void
     {
-        $xmlProcessor = new XmlProcessor([
-            $this->getMockForAbstractClass(NodeProcessorInterface::class)
-        ]);
-        $context = $xmlProcessor->getProcessorContext();
-        self::assertInstanceOf(XmlProcessorContext::class, $context);
+        $nodeProcessor = $this->getMockForAbstractClass(TestNodeProcessor::class);
+        $xmlProcessor = new XmlProcessor([$nodeProcessor]);
+
+        self::assertInstanceOf(TestNodeProcessor::class, $xmlProcessor->getProcessor(TestNodeProcessor::class));
+        self::assertInstanceOf(get_class($nodeProcessor), $xmlProcessor->getProcessor(TestNodeProcessor::class));
+        self::assertNull($xmlProcessor->getProcessor(OpenNodeProcessorInterface::class));
     }
 
     public function testProcessFile()
@@ -58,5 +64,62 @@ class XmlProcessorTest extends TestCase
         ]);
 
         $xmlProcessor->processFile(__DIR__ . '/../Fixtures/XmlProcessorTest/test.xml');
+
+        $xmlProcessor->setSkipNodes(['foo']);
+        $xmlProcessor->processFile(__DIR__ . '/../Fixtures/XmlProcessorTest/test.xml');
+
+        $xmlProcessor = new XmlProcessor(
+            [$nodeProcessor],
+            [\XMLReader::SUBST_ENTITIES => true]
+        );
+        $xmlProcessor->processFile(__DIR__ . '/../Fixtures/XmlProcessorTest/test.xml');
+
+        if(!function_exists('str_end_with')){
+            function str_end_with(string $nodePath, string $expected){
+                return substr_compare($nodePath, $expected, -strlen($expected)) === 0;
+            }
+        }
+        $xmlProcessor->processFile(__DIR__ . '/../Fixtures/XmlProcessorTest/test.xml');
     }
+
+    /**
+     * @dataProvider checkNodePathDataProvider
+     */
+    function testCheckNodePath(string $nodePath, string $expected, bool $result): void
+    {
+        self::assertSame(XmlProcessor::checkNodePath($nodePath, $expected), $result);
+    }
+
+    public static function checkNodePathDataProvider(): iterable
+    {
+        yield ['/foo/bar', 'foo/bar', true];
+        yield ['/foo', 'foo/bar', false];
+        yield ['foo', 'foo/bar', false];
+        yield ['bar', 'foo/bar', false];
+        yield ['foo/bar', 'bar', true];
+        yield ['foo/bar', 'foo/bar', true];
+        yield ['foo/bar/baz', 'foo/bar', false];
+    }
+
+    function testSetSkipNodes(): void
+    {
+        $xmlProcessor = new XmlProcessor([
+            $this->getMockForAbstractClass(NodeProcessorInterface::class)
+        ]);
+        $xmlProcessor->setSkipNodes(['foo']);
+        self::assertSame(['foo'], $xmlProcessor->getSkipNodes());
+    }
+
+    function testGetSkipNodes(): void
+    {
+        $xmlProcessor = new XmlProcessor([
+            $this->getMockForAbstractClass(NodeProcessorInterface::class)
+        ]);
+        self::assertNull($xmlProcessor->getSkipNodes());
+        $xmlProcessor->setSkipNodes([]);
+        self::assertSame([], $xmlProcessor->getSkipNodes());
+        $xmlProcessor->setSkipNodes(['foo']);
+        self::assertSame(['foo'], $xmlProcessor->getSkipNodes());
+    }
+
 }
