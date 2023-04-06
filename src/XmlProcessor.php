@@ -185,6 +185,9 @@ class XmlProcessor
     private function createContext(string $contextClass): NodeProcessorContext
     {
         $context = new $contextClass($this->context, $this->nodePath);
+        if (method_exists($context, 'setSelfClosing')) {
+            $context->setSelfClosing($this->selfClosing);
+        }
         if (method_exists($context, 'setAttributes')) {
             $context->setAttributes($this->getAttributes());
         }

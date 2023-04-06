@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Netlogix\XmlProcessor\NodeProcessor\Context;
 
-class OpenContext extends NodeProcessorContext
+class OpenContext extends AbstractElementContext
 {
     /**
      * @var array<string>
