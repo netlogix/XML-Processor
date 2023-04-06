@@ -73,12 +73,26 @@ class XmlProcessorTest extends TestCase
             [\XMLReader::SUBST_ENTITIES => true]
         );
         $xmlProcessor->processFile(__DIR__ . '/../Fixtures/XmlProcessorTest/test.xml');
+    }
 
-        if(!function_exists('str_end_with')){
-            function str_end_with(string $nodePath, string $expected){
-                return substr_compare($nodePath, $expected, -strlen($expected)) === 0;
-            }
-        }
+    public function testProcessFile_skipCurrentNode()
+    {
+        $nodeProcessor = $this->getMockForAbstractClass(NodeProcessorInterface::class);
+
+        $nodeProcessor->method('getSubscribedEvents')
+            ->will(
+                $this->returnCallback(fn() => yield from [
+                    'NodeType_' . \XMLReader::ELEMENT => function (OpenContext $context) {
+                        $context->getXmlProcessorContext()->skipCurrentNode();
+                        self::assertNotEquals('bar', $context->getCurrentNodeName());
+                    },
+                ])
+            );
+
+        $xmlProcessor = new XmlProcessor([
+            $nodeProcessor
+        ]);
+
         $xmlProcessor->processFile(__DIR__ . '/../Fixtures/XmlProcessorTest/test.xml');
     }
 
@@ -90,8 +104,9 @@ class XmlProcessorTest extends TestCase
         self::assertSame(XmlProcessor::checkNodePath($nodePath, $expected), $result);
     }
 
-    public static function checkNodePathDataProvider(): iterable
+    public static function checkNodePathDataProvider(): \Generator
     {
+        yield ['', 'foo/bar', false];
         yield ['/foo/bar', 'foo/bar', true];
         yield ['/foo', 'foo/bar', false];
         yield ['foo', 'foo/bar', false];
