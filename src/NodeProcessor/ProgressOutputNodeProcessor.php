@@ -31,7 +31,7 @@ class ProgressOutputNodeProcessor implements NodeProcessorInterface, OpenNodePro
         $this->progressBar = NULL;
     }
 
-    function getSubscribedEvents(string $nodePath, XmlProcessorContext $context): \Iterator
+    function getSubscribedEvents(string $nodePath, XmlProcessorContext $context): \Generator
     {
         if ($this->progressBar === NULL) {
             yield XmlProcessor::EVENT_OPEN_FILE => [$this, 'openFile'];
