@@ -108,21 +108,6 @@ class XmlProcessor
 
     private function shouldSkipNode(): bool
     {
-        if ($this->skipNodes === NULL) {
-            return false;
-        }
-        $nodePath = implode('/', $this->nodePath);
-        foreach ($this->skipNodes as $skipNode) {
-            if (self::checkNodePath($nodePath, $skipNode)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private function shouldSkipNode(): bool
-    {
         if ($this->skipCurrentNode) {
             $this->skipCurrentNode = false;
             return true;
