@@ -28,6 +28,9 @@ class XmlProcessor
     /** @var iterable<bool> */
     private iterable $parserProperties;
 
+    private bool $skipCurrentNode = false;
+    private bool $selfClosing = false;
+
     /**
      * @param iterable<NodeProcessorInterface> $processors
      * @param iterable<bool> $parserProperties
@@ -43,7 +46,7 @@ class XmlProcessor
         $this->context = new XmlProcessorContext(
             $this->xml,
             $this->processors,
-            fn() => $this->skipNode()
+            fn() => $this->skipCurrentNode = true
         );
     }
 
@@ -75,13 +78,12 @@ class XmlProcessor
                     $this->eventCloseElement();
                     break;
                 case \XMLReader::ELEMENT:
-                    $selfClosing = $this->xml->isEmptyElement;
+                    $this->selfClosing = $this->xml->isEmptyElement;
                     $this->eventOpenElement();
-                    if ($this->shouldSkipNode()) {
-                        $this->skipNode();
-                        break;
+                    if ($skip = $this->shouldSkipNode()) {
+                        $this->xml->next();
                     }
-                    if ($selfClosing) {
+                    if ($skip || $this->selfClosing) {
                         $this->eventCloseElement();
                     }
                     break;
@@ -106,6 +108,10 @@ class XmlProcessor
 
     private function shouldSkipNode(): bool
     {
+        if ($this->skipCurrentNode) {
+            $this->skipCurrentNode = false;
+            return true;
+        }
         if ($this->skipNodes === NULL) {
             return false;
         }
@@ -186,6 +192,9 @@ class XmlProcessor
     private function createContext(string $contextClass): NodeProcessorContext
     {
         $context = new $contextClass($this->context, $this->nodePath);
+        if (method_exists($context, 'setSelfClosing')) {
+            $context->setSelfClosing($this->selfClosing);
+        }
         if (method_exists($context, 'setAttributes')) {
             $context->setAttributes($this->getAttributes());
         }
