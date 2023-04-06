@@ -99,6 +99,28 @@ class XmlProcessor
         $this->xml->close();
     }
 
+    private function skipNode(): bool
+    {
+        $result = $this->xml->next();
+        $this->eventCloseElement();
+        return $result;
+    }
+
+    private function shouldSkipNode(): bool
+    {
+        if ($this->skipNodes === NULL) {
+            return false;
+        }
+        $nodePath = implode('/', $this->nodePath);
+        foreach ($this->skipNodes as $skipNode) {
+            if (self::checkNodePath($nodePath, $skipNode)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function shouldSkipNode(): bool
     {
         if ($this->skipCurrentNode) {

@@ -94,6 +94,22 @@ class XmlProcessorTest extends TestCase
         ]);
 
         $xmlProcessor->processFile(__DIR__ . '/../Fixtures/XmlProcessorTest/test.xml');
+
+        $xmlProcessor->setSkipNodes(['foo']);
+        $xmlProcessor->processFile(__DIR__ . '/../Fixtures/XmlProcessorTest/test.xml');
+
+        $xmlProcessor = new XmlProcessor(
+            [$nodeProcessor],
+            [\XMLReader::SUBST_ENTITIES => true]
+        );
+        $xmlProcessor->processFile(__DIR__ . '/../Fixtures/XmlProcessorTest/test.xml');
+
+        if(!function_exists('str_end_with')){
+            function str_end_with(string $nodePath, string $expected){
+                return substr_compare($nodePath, $expected, -strlen($expected)) === 0;
+            }
+        }
+        $xmlProcessor->processFile(__DIR__ . '/../Fixtures/XmlProcessorTest/test.xml');
     }
 
     /**
