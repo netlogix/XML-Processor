@@ -89,10 +89,11 @@ class ProgressOutputNodeProcessorTest extends TestCase
 
         $progressBar->expects($this->once())->method('advance')->with(1);
         $progressBar->expects($this->once())->method('setMessage')->with('foo/bar', 'node');
+        $progressBar->expects($this->once())->method('finish');
         $progressBarFactory = $this::getMockBuilder(NodeProcessorProgressBarFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $progressBarFactory->method('createProgressBar')->willReturn($progressBar);
+        $progressBarFactory->expects($this->exactly(2))->method('createProgressBar')->willReturn($progressBar);
 
         $nodeProcessor = new ProgressOutputNodeProcessor($progressBarFactory);
         $nodeProcessor->setOutput($this->getOutputMock());
@@ -102,6 +103,7 @@ class ProgressOutputNodeProcessorTest extends TestCase
         $openContext->method('getNodePath')->willReturn('foo/bar');
 
         $nodeProcessor->openElement($openContext);
+        $nodeProcessor->openFile();
     }
 
     function testEndOfFile(): void
