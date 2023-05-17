@@ -1,6 +1,12 @@
 {
   "name": "netlogix/xml-processor",
   "description": "PHP XML-Processor based on XMLReader",
+  "homepage": "https://github.com/netlogix/XML-Processor",
+  "support":{
+    "source": "https://github.com/netlogix/XML-Processor/",
+    "docs": "https://github.com/netlogix/XML-Processor/blob/main/README.md",
+    "issues": "https://github.com/netlogix/XML-Processor/issues"
+  },
   "license": "MIT",
   "require": {
     "php": "^7.4 || ^8.0",
