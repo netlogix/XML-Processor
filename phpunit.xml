@@ -4,6 +4,9 @@
          bootstrap="vendor/autoload.php"
          colors="true"
          >
+    <extensions>
+        <extension class="Netlogix\XmlProcessor\Tests\Hooks\BypassFinalHook"/>
+    </extensions>
     <coverage>
         <include>
             <directory suffix=".php">src/</directory>
