@@ -77,8 +77,8 @@ class ProgressOutputNodeProcessorTest extends TestCase
         $nodeProcessor->setOutput($this->getOutputMock());
         $nodeProcessor->openFile();
         self::assertInstanceOf(ProgressBar::class, $this->progressBarProperty->getValue($nodeProcessor));
-
-        self::markTestIncomplete('ToDo: $this->progressBar->finish()');
+        $nodeProcessor->openFile();
+        self::assertInstanceOf(ProgressBar::class, $this->progressBarProperty->getValue($nodeProcessor));
     }
 
     public function testOpenElement(): void
