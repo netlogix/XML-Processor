@@ -17,9 +17,9 @@ jobs:
           - { php: 8.3, phpunit: 10, experimental: true }
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Composer cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: "vendor"
           key: ${{ runner.os }}-${{ matrix.env.php }}-composer-${{ hashFiles('composer.json') }}
@@ -37,7 +37,7 @@ jobs:
         run: composer install -o --no-interaction --no-suggest --prefer-dist
 
       - name: PHPUnit tests
-        uses: php-actions/phpunit@v3
+        uses: php-actions/phpunit@v4
         env:
           XDEBUG_MODE: coverage
         with:
@@ -67,6 +67,6 @@ jobs:
           path: code-coverage-results.md
 
       - name: Behat tests
-        uses: php-actions/behat@master
+        uses: php-actions/behat@v1.0.1
         with:
           php_version: "${{ matrix.env.php }}"
