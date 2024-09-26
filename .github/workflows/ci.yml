@@ -67,7 +67,5 @@ jobs:
           path: code-coverage-results.md
 
       - name: Behat tests
-        uses: php-actions/behat@v1.0.1
-        with:
-          php_version: "${{ matrix.env.php }}"
-          vendored_behat_path: "vendor/bin/behat"
+        run: composer run behat
+
