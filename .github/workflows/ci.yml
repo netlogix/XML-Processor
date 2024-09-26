@@ -13,7 +13,7 @@ jobs:
           - { php: 7.4, phpunit: 9 }
           - { php: 8.0, phpunit: 10 }
           - { php: 8.1, phpunit: 10 }
-          - { php: 8.2, phpunit: 10 }
+          - { php: 8.2, phpunit: 10, main: true }
           - { php: 8.3, phpunit: 10, experimental: true }
 
     steps:
@@ -47,7 +47,7 @@ jobs:
           version: "${{ matrix.env.phpunit }}"
           configuration: "phpunit.xml"
       - name: "Code Coverage Report"
-        if: "matrix.env.php == '8.2' && github.event_name == 'pull_request'"
+        if: "matrix.env.main == true && github.event_name == 'pull_request'"
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
           filename: cobertura.xml
@@ -60,7 +60,7 @@ jobs:
           output: both
           thresholds: '60 80'
       - name: Add Coverage PR Comment
-        if: "matrix.env.php == '8.2' && github.event_name == 'pull_request'"
+        if: "matrix.env.main == true && github.event_name == 'pull_request'"
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           recreate: true
@@ -70,3 +70,4 @@ jobs:
         uses: php-actions/behat@v1.0.1
         with:
           php_version: "${{ matrix.env.php }}"
+          vendored_behat_path: vendor/bin/behat
