@@ -70,4 +70,4 @@ jobs:
         uses: php-actions/behat@v1.0.1
         with:
           php_version: "${{ matrix.env.php }}"
-          vendored_behat_path: ${GITHUB_WORKSPACE}/vendor/bin/behat
+          vendored_behat_path: "${{ github.workspace }}/vendor/bin/behat"
