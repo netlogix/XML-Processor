@@ -18,6 +18,7 @@ class XmlProcessor
     private string $currentValue = '';
 
     private ?array $skipNodes = NULL;
+    private array $eventCache = [];
 
     private \XMLReader $xml;
     private XmlProcessorContext $context;
@@ -37,7 +38,9 @@ class XmlProcessor
      */
     public function __construct(
         iterable $processors,
-        iterable $parserProperties = []
+        iterable $parserProperties = [
+            \XMLReader::VALIDATE => false
+        ]
     )
     {
         $this->xml = new \XMLReader();
@@ -158,13 +161,19 @@ class XmlProcessor
     private function getProcessorForEvent(string $event): iterable
     {
         $nodePath = implode('/', $this->nodePath);
-        foreach ($this->processors as $processor) {
-            foreach ($processor->getSubscribedEvents($nodePath, $this->context) as $e => $action) {
-                if ($e === $event) {
-                    yield $action;
+
+        if (!is_array($this->eventCache[$nodePath][$event] ?? false)) {
+            $this->eventCache[$nodePath][$event] = [];
+            foreach ($this->processors as $processor) {
+                foreach ($processor->getSubscribedEvents($nodePath, $this->context) as $e => $action) {
+                    if ($e === $event) {
+                        $this->eventCache[$nodePath][$event][] = $action;
+                    }
                 }
             }
         }
+
+        yield from $this->eventCache[$nodePath][$event];
     }
 
     /**

@@ -27,5 +27,8 @@
       "Netlogix\\XmlProcessor\\Behat\\": "features/"
     }
   },
+  "scripts": {
+    "behat": "behat"
+  },
   "prefer-stable": true
 }
