@@ -217,10 +217,7 @@ class XmlProcessor
     {
         return
             $expected === '/' . $nodePath ||
-            $nodePath === $expected || (
-            function_exists('str_end_with')
-                ? str_end_with($nodePath, $expected) :
-                substr_compare($nodePath, $expected, -strlen($expected)) === 0
-            );
+            $nodePath === $expected ||
+            str_ends_with($nodePath, $expected);
     }
 }
