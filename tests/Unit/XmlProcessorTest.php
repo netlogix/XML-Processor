@@ -1,8 +1,11 @@
 <?php
-declare(strict_types=1);
+
+declare(strict_types = 1);
 
 namespace Netlogix\XmlProcessor\Tests\Unit;
 
+use XMLReader;
+use Generator;
 use Netlogix\XmlProcessor\NodeProcessor\CloseNodeProcessorInterface;
 use Netlogix\XmlProcessor\NodeProcessor\Context\CloseContext;
 use Netlogix\XmlProcessor\NodeProcessor\Context\OpenContext;
@@ -18,14 +21,11 @@ class XmlProcessorTest extends TestCase
 {
     public function test__construct()
     {
-        $xmlProcessor = new XmlProcessor(
-            [
-                $this->getMockForAbstractClass(NodeProcessorInterface::class)
-            ],
-            [
-                \XMLReader::SUBST_ENTITIES => true
-            ]
-        );
+        $xmlProcessor = new XmlProcessor([
+            $this->getMockForAbstractClass(NodeProcessorInterface::class)
+        ], [
+            XMLReader::SUBST_ENTITIES => true
+        ]);
         self::assertInstanceOf(XmlProcessor::class, $xmlProcessor);
     }
 
@@ -44,20 +44,30 @@ class XmlProcessorTest extends TestCase
         $nodeProcessor = $this->getMockForAbstractClass(NodeProcessorInterface::class);
 
         $openCallableMock = $this->getMockBuilder(OpenNodeProcessorInterface::class)->getMock();
-        $openCallableMock->expects($this->atLeastOnce())->method('openElement')->with($this->isInstanceOf(OpenContext::class));
+        $openCallableMock
+            ->expects($this->atLeastOnce())
+            ->method('openElement')
+            ->with($this->isInstanceOf(OpenContext::class));
         $textCallableMock = $this->getMockBuilder(TextNodeProcessorInterface::class)->getMock();
-        $textCallableMock->expects($this->atLeastOnce())->method('textElement')->with($this->isInstanceOf(TextContext::class));
+        $textCallableMock
+            ->expects($this->atLeastOnce())
+            ->method('textElement')
+            ->with($this->isInstanceOf(TextContext::class));
         $closeCallableMock = $this->getMockBuilder(CloseNodeProcessorInterface::class)->getMock();
-        $closeCallableMock->expects($this->atLeastOnce())->method('closeElement')->with($this->isInstanceOf(CloseContext::class));
+        $closeCallableMock
+            ->expects($this->atLeastOnce())
+            ->method('closeElement')
+            ->with($this->isInstanceOf(CloseContext::class));
 
-        $nodeProcessor->method('getSubscribedEvents')
-            ->will(
-                $this->returnCallback(fn() => yield from [
-                    'NodeType_' . \XMLReader::ELEMENT => [$openCallableMock, 'openElement'],
-                    'NodeType_' . \XMLReader::END_ELEMENT => [$closeCallableMock, 'closeElement'],
-                    'NodeType_' . \XMLReader::TEXT => [$textCallableMock, 'textElement']
-                ])
-            );
+        $nodeProcessor
+            ->method('getSubscribedEvents')
+            ->will($this->returnCallback(
+                fn() => yield from [
+                    XmlProcessor::NODE_TYPE_ELEMENT => [$openCallableMock, 'openElement'],
+                    XmlProcessor::NODE_TYPE_END_ELEMENT => [$closeCallableMock, 'closeElement'],
+                    XmlProcessor::NODE_TYPE_TEXT => [$textCallableMock, 'textElement']
+                ]
+            ));
 
         $xmlProcessor = new XmlProcessor([
             $nodeProcessor
@@ -68,10 +78,7 @@ class XmlProcessorTest extends TestCase
         $xmlProcessor->setSkipNodes(['foo']);
         $xmlProcessor->processFile(__DIR__ . '/../Fixtures/XmlProcessorTest/test.xml');
 
-        $xmlProcessor = new XmlProcessor(
-            [$nodeProcessor],
-            [\XMLReader::SUBST_ENTITIES => true]
-        );
+        $xmlProcessor = new XmlProcessor([$nodeProcessor], [XMLReader::SUBST_ENTITIES => true]);
         $xmlProcessor->processFile(__DIR__ . '/../Fixtures/XmlProcessorTest/test.xml');
     }
 
@@ -79,15 +86,16 @@ class XmlProcessorTest extends TestCase
     {
         $nodeProcessor = $this->getMockForAbstractClass(NodeProcessorInterface::class);
 
-        $nodeProcessor->method('getSubscribedEvents')
-            ->will(
-                $this->returnCallback(fn() => yield from [
-                    'NodeType_' . \XMLReader::ELEMENT => function (OpenContext $context) {
+        $nodeProcessor
+            ->method('getSubscribedEvents')
+            ->will($this->returnCallback(
+                fn() => yield from [
+                    XmlProcessor::NODE_TYPE_ELEMENT => function (OpenContext $context): void {
                         $context->getXmlProcessorContext()->skipCurrentNode();
                         self::assertNotEquals('bar', $context->getCurrentNodeName());
-                    },
-                ])
-            );
+                    }
+                ]
+            ));
 
         $xmlProcessor = new XmlProcessor([
             $nodeProcessor
@@ -98,17 +106,9 @@ class XmlProcessorTest extends TestCase
         $xmlProcessor->setSkipNodes(['foo']);
         $xmlProcessor->processFile(__DIR__ . '/../Fixtures/XmlProcessorTest/test.xml');
 
-        $xmlProcessor = new XmlProcessor(
-            [$nodeProcessor],
-            [\XMLReader::SUBST_ENTITIES => true]
-        );
+        $xmlProcessor = new XmlProcessor([$nodeProcessor], [XMLReader::SUBST_ENTITIES => true]);
         $xmlProcessor->processFile(__DIR__ . '/../Fixtures/XmlProcessorTest/test.xml');
 
-        if(!function_exists('str_end_with')){
-            function str_end_with(string $nodePath, string $expected){
-                return substr_compare($nodePath, $expected, -strlen($expected)) === 0;
-            }
-        }
         $xmlProcessor->processFile(__DIR__ . '/../Fixtures/XmlProcessorTest/test.xml');
     }
 
@@ -120,7 +120,7 @@ class XmlProcessorTest extends TestCase
         self::assertSame(XmlProcessor::checkNodePath($nodePath, $expected), $result);
     }
 
-    public static function checkNodePathDataProvider(): \Generator
+    public static function checkNodePathDataProvider(): Generator
     {
         yield ['', 'foo/bar', false];
         yield ['/foo/bar', 'foo/bar', true];
@@ -152,5 +152,4 @@ class XmlProcessorTest extends TestCase
         $xmlProcessor->setSkipNodes(['foo']);
         self::assertSame(['foo'], $xmlProcessor->getSkipNodes());
     }
-
 }

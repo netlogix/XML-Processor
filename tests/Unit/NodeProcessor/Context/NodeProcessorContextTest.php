@@ -1,5 +1,6 @@
 <?php
-declare(strict_types=1);
+
+declare(strict_types = 1);
 
 namespace Netlogix\XmlProcessor\Tests\Unit\NodeProcessor\Context;
 
@@ -10,14 +11,11 @@ use PHPUnit\Framework\TestCase;
 class NodeProcessorContextTest extends TestCase
 {
     private function getNodeProcessorContext(
-        ?XmlProcessorContext $context = NULL,
+        ?XmlProcessorContext $context = null,
         array $nodePath = ['foo', 'bar']
-    ): NodeProcessorContext
-    {
+    ): NodeProcessorContext {
         return new NodeProcessorContext(
-            $context ?? $this->getMockBuilder(XmlProcessorContext::class)
-            ->disableOriginalConstructor()
-            ->getMock(),
+            $context ?? $this->getMockBuilder(XmlProcessorContext::class)->disableOriginalConstructor()->getMock(),
             $nodePath
         );
     }
@@ -35,9 +33,7 @@ class NodeProcessorContextTest extends TestCase
 
     public function testGetXmlProcessorContext(): void
     {
-        $context = $this->getMockBuilder(XmlProcessorContext::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->getMockBuilder(XmlProcessorContext::class)->disableOriginalConstructor()->getMock();
 
         self::assertEquals($context, $this->getNodeProcessorContext($context)->getXmlProcessorContext());
     }

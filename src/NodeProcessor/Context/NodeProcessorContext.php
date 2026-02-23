@@ -1,5 +1,6 @@
 <?php
-declare(strict_types=1);
+
+declare(strict_types = 1);
 
 namespace Netlogix\XmlProcessor\NodeProcessor\Context;
 
@@ -20,8 +21,7 @@ class NodeProcessorContext
     public function __construct(
         XmlProcessorContext $xmlProcessorContext,
         array $nodePath
-    )
-    {
+    ) {
         $this->xmlProcessorContext = $xmlProcessorContext;
         $this->nodePath = $nodePath;
     }
@@ -33,12 +33,12 @@ class NodeProcessorContext
 
     public function getCurrentNodeName(): ?string
     {
-        return end($this->nodePath) ?: NULL;
+        return \end($this->nodePath) ?: null;
     }
 
     public function getNodePath(): string
     {
-        return implode('/', $this->nodePath);
+        return \implode('/', $this->nodePath);
     }
 
     /**

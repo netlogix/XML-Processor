@@ -6,6 +6,7 @@ namespace Netlogix\XmlProcessor\Behat\NodeProcessor;
 use Netlogix\XmlProcessor\NodeProcessor\Context\OpenContext;
 use Netlogix\XmlProcessor\NodeProcessor\Context\TextContext;
 use Netlogix\XmlProcessor\NodeProcessor\NodeProcessorInterface;
+use Netlogix\XmlProcessor\XmlProcessor;
 use Netlogix\XmlProcessor\XmlProcessorContext;
 
 class ArrayNodeProcessor implements NodeProcessorInterface, InvokeNodeProcessorInterface
@@ -36,7 +37,7 @@ class ArrayNodeProcessor implements NodeProcessorInterface, InvokeNodeProcessorI
 
     public function openElement(OpenContext $context): void
     {
-        $currentLevel = count($context->getNodePathArray());
+        $currentLevel = \count($context->getNodePathArray());
         $newValue = [
             'node' => $context->getCurrentNodeName(),
             'level' => $currentLevel,

@@ -9,14 +9,11 @@ use PHPUnit\Framework\TestCase;
 class TextContextTest extends TestCase
 {
     private function getTextContext(
-        ?XmlProcessorContext $context = NULL,
+        ?XmlProcessorContext $context = null,
         array $nodePath = ['foo', 'bar']
-    ): TextContext
-    {
+    ): TextContext {
         return new TextContext(
-            $context ?? $this->getMockBuilder(XmlProcessorContext::class)
-            ->disableOriginalConstructor()
-            ->getMock(),
+            $context ?? $this->getMockBuilder(XmlProcessorContext::class)->disableOriginalConstructor()->getMock(),
             $nodePath
         );
     }
@@ -40,5 +37,4 @@ class TextContextTest extends TestCase
         $context->setText('bar');
         self::assertEquals('bar', $context->getText());
     }
-
 }

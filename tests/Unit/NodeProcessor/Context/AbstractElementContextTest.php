@@ -1,8 +1,10 @@
 <?php
-declare(strict_types=1);
+
+declare(strict_types = 1);
 
 namespace Netlogix\XmlProcessor\Tests\Unit\NodeProcessor\Context;
 
+use Generator;
 use Netlogix\XmlProcessor\NodeProcessor\Context\AbstractElementContext;
 use Netlogix\XmlProcessor\XmlProcessorContext;
 use PHPUnit\Framework\TestCase;
@@ -10,14 +12,11 @@ use PHPUnit\Framework\TestCase;
 class AbstractElementContextTest extends TestCase
 {
     private function getCloseContext(
-        ?XmlProcessorContext $context = NULL,
+        ?XmlProcessorContext $context = null,
         array $nodePath = ['foo', 'bar']
-    ): AbstractElementContext
-    {
+    ): AbstractElementContext {
         return new AbstractElementContext(
-            $context ?? $this->getMockBuilder(XmlProcessorContext::class)
-            ->disableOriginalConstructor()
-            ->getMock(),
+            $context ?? $this->getMockBuilder(XmlProcessorContext::class)->disableOriginalConstructor()->getMock(),
             $nodePath
         );
     }
@@ -38,7 +37,7 @@ class AbstractElementContextTest extends TestCase
         self::assertEquals($expect, $nodeProcessorContext->getSelfClosing());
     }
 
-    function setSelfClosingDataProvider(): \Generator
+    function setSelfClosingDataProvider(): Generator
     {
         yield [true, true];
         yield [false, false];
@@ -50,17 +49,16 @@ class AbstractElementContextTest extends TestCase
     function testGetSelfClosing($set, $expect): void
     {
         $nodeProcessorContext = $this->getCloseContext();
-        if ($set !== NULL) {
+        if ($set !== null) {
             $nodeProcessorContext->setSelfClosing($set);
         }
         self::assertEquals($expect, $nodeProcessorContext->getSelfClosing());
     }
 
-    function getSelfClosingDataProvider(): \Generator
+    function getSelfClosingDataProvider(): Generator
     {
-        yield [NULL, false];
+        yield [null, false];
         yield [true, true];
         yield [false, false];
     }
-
 }
