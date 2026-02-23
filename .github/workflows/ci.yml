@@ -69,5 +69,4 @@ jobs:
           path: code-coverage-results.md
 
       - name: Behat tests
-        run: composer run behat
-
+        run: composer run test:behat
