@@ -21,13 +21,13 @@ class AbstractNodeProcessor implements NodeProcessorInterface
     {
         if ($this->isNode($nodePath)) {
             if ($this instanceof OpenNodeProcessorInterface) {
-                yield 'NodeType_' . \XMLReader::ELEMENT => [$this, 'openElement'];
+                yield XmlProcessor::NODE_TYPE_ELEMENT => [$this, 'openElement'];
             }
             if ($this instanceof CloseNodeProcessorInterface) {
-                yield 'NodeType_' . \XMLReader::END_ELEMENT => [$this, 'closeElement'];
+                yield XmlProcessor::NODE_TYPE_END_ELEMENT => [$this, 'closeElement'];
             }
             if ($this instanceof TextNodeProcessorInterface) {
-                yield 'NodeType_' . \XMLReader::TEXT => [$this, 'textElement'];
+                yield XmlProcessor::NODE_TYPE_TEXT => [$this, 'textElement'];
             }
         }
         yield from [];

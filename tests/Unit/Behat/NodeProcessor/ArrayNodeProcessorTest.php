@@ -24,10 +24,13 @@ class ArrayNodeProcessorTest extends TestCase
         $context = $this->getMockBuilder(XmlProcessorContext::class)->disableOriginalConstructor()->getMock();
         self::assertIsIterable($nodeProcessor->getSubscribedEvents('test', $context));
         $events = iterator_to_array($nodeProcessor->getSubscribedEvents('test', $context));
-        self::assertEquals([
-            'NodeType_' . \XMLReader::ELEMENT => [$nodeProcessor, 'openElement'],
-            'NodeType_' . \XMLReader::TEXT => [$nodeProcessor, 'textElement']
-        ], $events);
+        self::assertEquals(
+            [
+                XmlProcessor::NODE_TYPE_ELEMENT => [$nodeProcessor, 'openElement'],
+                XmlProcessor::NODE_TYPE_TEXT => [$nodeProcessor, 'textElement']
+            ],
+            $events
+        );
     }
 
 

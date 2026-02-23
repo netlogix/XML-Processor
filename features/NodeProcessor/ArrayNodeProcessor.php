@@ -30,8 +30,8 @@ class ArrayNodeProcessor implements NodeProcessorInterface, InvokeNodeProcessorI
 
     public function getSubscribedEvents(string $nodePath, XmlProcessorContext $context): iterable
     {
-        yield 'NodeType_' . \XMLReader::ELEMENT => [$this, 'openElement'];
-        yield 'NodeType_' . \XMLReader::TEXT => [$this, 'textElement'];
+        yield XmlProcessor::NODE_TYPE_ELEMENT => [$this, 'openElement'];
+        yield XmlProcessor::NODE_TYPE_TEXT => [$this, 'textElement'];
     }
 
     public function openElement(OpenContext $context): void
