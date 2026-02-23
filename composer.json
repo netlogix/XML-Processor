@@ -1,21 +1,25 @@
 {
   "name": "netlogix/xml-processor",
   "description": "PHP XML-Processor based on XMLReader",
-  "homepage": "https://github.com/netlogix/XML-Processor",
-  "support":{
-    "source": "https://github.com/netlogix/XML-Processor/",
-    "docs": "https://github.com/netlogix/XML-Processor/blob/main/README.md",
-    "issues": "https://github.com/netlogix/XML-Processor/issues"
-  },
   "license": "MIT",
+  "homepage": "https://github.com/netlogix/XML-Processor",
+  "support": {
+    "issues": "https://github.com/netlogix/XML-Processor/issues",
+    "source": "https://github.com/netlogix/XML-Processor/",
+    "docs": "https://github.com/netlogix/XML-Processor/blob/main/README.md"
+  },
   "require": {
     "php": "^7.4 || ^8.0",
-    "ext-xmlreader": "*"
+    "ext-xmlreader": "*",
+    "symfony/polyfill-php80": ">=1.33.0"
   },
   "require-dev": {
     "behat/behat": "^3.12.0",
-    "phpunit/phpunit": "^9.6.6"
+    "ergebnis/composer-normalize": "^2.50",
+    "phpunit/phpunit": "^9.6.6",
+    "rector/rector": "^2.3"
   },
+  "prefer-stable": true,
   "autoload": {
     "psr-4": {
       "Netlogix\\XmlProcessor\\": "src/"
@@ -23,12 +27,39 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Netlogix\\XmlProcessor\\Tests\\": "tests/",
-      "Netlogix\\XmlProcessor\\Behat\\": "features/"
+      "Netlogix\\XmlProcessor\\Behat\\": "features/",
+      "Netlogix\\XmlProcessor\\Tests\\": "tests/"
     }
   },
-  "scripts": {
-    "behat": "behat"
+  "config": {
+    "allow-plugins": {
+      "ergebnis/composer-normalize": true
+    },
+    "optimize-autoloader": true
   },
-  "prefer-stable": true
+  "scripts": {
+    "apply-coding-standard": [
+      "@composer:normalize:fix",
+      "@rector:fix",
+      "@format:fix"
+    ],
+    "auto-scripts": {
+      "cache:clear": "symfony-cmd",
+      "assets:install %PUBLIC_DIR%": "symfony-cmd"
+    },
+    "composer:normalize": "@composer normalize --no-check-lock --dry-run",
+    "composer:normalize:fix": "@composer normalize --no-check-lock",
+    "format": "mago fmt --dry-run",
+    "format:fix": "mago fmt",
+    "lint": "mago lint",
+    "rector": "rector process --dry-run",
+    "rector:fix": "rector process",
+    "test": [
+      "@test:unit",
+      "@test:behat"
+    ],
+    "test:behat": "behat",
+    "test:coverage": "XDEBUG_MODE=coverage phpunit --testdox --coverage-html .coverage",
+    "test:unit": "phpunit --testdox --testsuite unit"
+  }
 }
