@@ -1,8 +1,10 @@
 <?php
-declare(strict_types=1);
+
+declare(strict_types = 1);
 
 namespace Netlogix\XmlProcessor\Tests\Unit\Behat\NodeProcessor;
 
+use Netlogix\XmlProcessor\XmlProcessor;
 use Netlogix\XmlProcessor\Behat\NodeProcessor\ArrayNodeProcessor;
 use Netlogix\XmlProcessor\NodeProcessor\Context\OpenContext;
 use Netlogix\XmlProcessor\NodeProcessor\Context\TextContext;
@@ -11,7 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class ArrayNodeProcessorTest extends TestCase
 {
-
     function test__invoke(): void
     {
         $nodeProcessor = new ArrayNodeProcessor();
@@ -24,19 +25,21 @@ class ArrayNodeProcessorTest extends TestCase
         $context = $this->getMockBuilder(XmlProcessorContext::class)->disableOriginalConstructor()->getMock();
         self::assertIsIterable($nodeProcessor->getSubscribedEvents('test', $context));
         $events = iterator_to_array($nodeProcessor->getSubscribedEvents('test', $context));
-        self::assertEquals([
-            'NodeType_' . \XMLReader::ELEMENT => [$nodeProcessor, 'openElement'],
-            'NodeType_' . \XMLReader::TEXT => [$nodeProcessor, 'textElement']
-        ], $events);
+        self::assertEquals(
+            [
+                XmlProcessor::NODE_TYPE_ELEMENT => [$nodeProcessor, 'openElement'],
+                XmlProcessor::NODE_TYPE_TEXT => [$nodeProcessor, 'textElement']
+            ],
+            $events
+        );
     }
-
 
     function testOpenElement(): void
     {
         $data = [
             [
                 'nodePath' => ['foo'],
-                'attributes' => ['id' => '1'],
+                'attributes' => ['id' => '1']
             ],
             [
                 'nodePath' => ['foo', 'bar'],
@@ -50,12 +53,15 @@ class ArrayNodeProcessorTest extends TestCase
             ],
             [
                 'nodePath' => ['foo'],
-                'attributes' => ['id' => '2'],
-            ],
+                'attributes' => ['id' => '2']
+            ]
         ];
 
         $nodeProcessor = new ArrayNodeProcessor();
-        $xmlProcessorContext = $this->getMockBuilder(XmlProcessorContext::class)->disableOriginalConstructor()->getMock();
+        $xmlProcessorContext = $this
+            ->getMockBuilder(XmlProcessorContext::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         foreach ($data as $item) {
             $context = new OpenContext($xmlProcessorContext, $item['nodePath']);
@@ -68,36 +74,37 @@ class ArrayNodeProcessorTest extends TestCase
             }
         }
 
-        self::assertEquals([
+        self::assertEquals(
             [
-                'node' => 'foo',
-                'level' => 1,
-                'attributes' => ['id' => '1'],
-                'children' => [
-                    [
-                        'node' => 'bar',
-                        'level' => 2,
-                        'attributes' => ['name' => 'me'],
-                        'children' => [],
-                        'text' => 'test'
-                    ],
-                    [
-                        'node' => 'bar',
-                        'level' => 2,
-                        'attributes' => ['name' => 'you'],
-                        'children' => [],
-                        'text' => 'test2'
-                    ],
+                [
+                    'node' => 'foo',
+                    'level' => 1,
+                    'attributes' => ['id' => '1'],
+                    'children' => [
+                        [
+                            'node' => 'bar',
+                            'level' => 2,
+                            'attributes' => ['name' => 'me'],
+                            'children' => [],
+                            'text' => 'test'
+                        ],
+                        [
+                            'node' => 'bar',
+                            'level' => 2,
+                            'attributes' => ['name' => 'you'],
+                            'children' => [],
+                            'text' => 'test2'
+                        ]
+                    ]
                 ],
-
+                [
+                    'node' => 'foo',
+                    'level' => 1,
+                    'attributes' => ['id' => '2'],
+                    'children' => []
+                ]
             ],
-            [
-                'node' => 'foo',
-                'level' => 1,
-                'attributes' => ['id' => '2'],
-                'children' => [],
-            ],
-        ], $nodeProcessor());
+            $nodeProcessor()
+        );
     }
-
 }

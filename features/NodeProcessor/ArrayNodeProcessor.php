@@ -6,6 +6,7 @@ namespace Netlogix\XmlProcessor\Behat\NodeProcessor;
 use Netlogix\XmlProcessor\NodeProcessor\Context\OpenContext;
 use Netlogix\XmlProcessor\NodeProcessor\Context\TextContext;
 use Netlogix\XmlProcessor\NodeProcessor\NodeProcessorInterface;
+use Netlogix\XmlProcessor\XmlProcessor;
 use Netlogix\XmlProcessor\XmlProcessorContext;
 
 class ArrayNodeProcessor implements NodeProcessorInterface, InvokeNodeProcessorInterface
@@ -30,13 +31,13 @@ class ArrayNodeProcessor implements NodeProcessorInterface, InvokeNodeProcessorI
 
     public function getSubscribedEvents(string $nodePath, XmlProcessorContext $context): iterable
     {
-        yield 'NodeType_' . \XMLReader::ELEMENT => [$this, 'openElement'];
-        yield 'NodeType_' . \XMLReader::TEXT => [$this, 'textElement'];
+        yield XmlProcessor::NODE_TYPE_ELEMENT => [$this, 'openElement'];
+        yield XmlProcessor::NODE_TYPE_TEXT => [$this, 'textElement'];
     }
 
     public function openElement(OpenContext $context): void
     {
-        $currentLevel = count($context->getNodePathArray());
+        $currentLevel = \count($context->getNodePathArray());
         $newValue = [
             'node' => $context->getCurrentNodeName(),
             'level' => $currentLevel,

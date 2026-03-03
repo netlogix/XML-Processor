@@ -1,22 +1,24 @@
 <?php
-declare(strict_types=1);
+
+declare(strict_types = 1);
 
 namespace Netlogix\XmlProcessor;
 
-use Netlogix\XmlProcessor\NodeProcessor\NamedNodeProcessorInterface;
+use XMLReader;
+use Closure;
 use Netlogix\XmlProcessor\NodeProcessor\NodeProcessorInterface;
 
 class XmlProcessorContext
 {
-    private \XMLReader $xml;
+    private XMLReader $xml;
     /**
      * @var iterable<NodeProcessorInterface>
      */
     private iterable $processors;
 
-    private \Closure $skipNode;
+    private Closure $skipNode;
 
-    public function __construct(\XMLReader $xml, iterable $processors, \Closure $skipNode)
+    public function __construct(XMLReader $xml, iterable $processors, Closure $skipNode)
     {
         $this->xml = $xml;
         $this->processors = $processors;
@@ -25,20 +27,21 @@ class XmlProcessorContext
 
     public function skipCurrentNode(): bool
     {
-        return ($this->skipNode)();
+        return ( $this->skipNode )();
     }
 
     public function getProcessor(string $class): ?NodeProcessorInterface
     {
         foreach ($this->processors as $processor) {
-            if (class_exists($class) && $processor instanceof $class) {
+            if (\class_exists($class) && $processor instanceof $class) {
                 return $processor;
             }
         }
-        return NULL;
+
+        return null;
     }
 
-    public function getXMLReader(): \XMLReader
+    public function getXMLReader(): XMLReader
     {
         return $this->xml;
     }

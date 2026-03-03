@@ -10,7 +10,10 @@ use Netlogix\XmlProcessor\NodeProcessor\Context\TextContext;
 use Netlogix\XmlProcessor\NodeProcessor\OpenNodeProcessorInterface;
 use Netlogix\XmlProcessor\NodeProcessor\TextNodeProcessorInterface;
 
-class TestNodeProcessor extends AbstractNodeProcessor implements OpenNodeProcessorInterface, TextNodeProcessorInterface, CloseNodeProcessorInterface
+class TestNodeProcessor extends AbstractNodeProcessor implements
+    OpenNodeProcessorInterface,
+    TextNodeProcessorInterface,
+    CloseNodeProcessorInterface
 {
     const NODE_PATH = 'test';
 

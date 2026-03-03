@@ -1,5 +1,6 @@
 <?php
-declare(strict_types=1);
+
+declare(strict_types = 1);
 
 namespace Netlogix\XmlProcessor\Tests\Unit\NodeProcessor\Context;
 
@@ -10,14 +11,11 @@ use PHPUnit\Framework\TestCase;
 class CloseContextTest extends TestCase
 {
     private function getCloseContext(
-        ?XmlProcessorContext $context = NULL,
+        ?XmlProcessorContext $context = null,
         array $nodePath = ['foo', 'bar']
-    ): CloseContext
-    {
+    ): CloseContext {
         return new CloseContext(
-            $context ?? $this->getMockBuilder(XmlProcessorContext::class)
-            ->disableOriginalConstructor()
-            ->getMock(),
+            $context ?? $this->getMockBuilder(XmlProcessorContext::class)->disableOriginalConstructor()->getMock(),
             $nodePath
         );
     }
@@ -27,5 +25,4 @@ class CloseContextTest extends TestCase
         $nodeProcessorContext = $this->getCloseContext();
         self::assertInstanceOf(CloseContext::class, $nodeProcessorContext);
     }
-
 }

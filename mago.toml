@@ -1,0 +1,47 @@
+php-version = "8.4"
+
+[source]
+workspace = "."
+paths = [
+    "src/",
+    "tests/",
+    # "importmap.php",
+    "migrations/",
+]
+includes = ["vendor"]
+excludes = []
+
+[formatter]
+print-width = 120
+tab-width = 4
+use-tabs = false
+preset = 'psr-12'
+excludes = []
+end-of-line = "Lf"
+single-quote = true
+empty-line-before-return = true
+
+[linter]
+integrations = ["phpunit"]
+
+[linter.rules]
+ambiguous-function-call = { enabled = false }
+literal-named-argument = { enabled = false }
+halstead = { effort-threshold = 7000 }
+final-controller = { enabled = false }
+no-boolean-flag-parameter = { enabled = false }
+
+[analyzer]
+find-unused-definitions = true
+find-unused-expressions = false
+analyze-dead-code = false
+memoize-properties = true
+allow-possibly-undefined-array-keys = true
+perform-heuristic-checks = true
+check-throws = false
+check-missing-override = false
+find-unused-parameters = false
+strict-list-index-checks = false
+no-boolean-literal-comparison = false
+check-missing-type-hints = false
+register-super-globals = true

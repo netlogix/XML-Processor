@@ -16,6 +16,7 @@ class NodePathNodeProcessor extends AbstractNodeProcessor
     function setNodePath(string $nodePath): self
     {
         $this->nodePath = $nodePath;
+
         return $this;
     }
 }

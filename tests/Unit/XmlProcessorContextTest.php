@@ -1,19 +1,20 @@
 <?php
-declare(strict_types=1);
+
+declare(strict_types = 1);
 
 namespace Netlogix\XmlProcessor\Tests\Unit;
 
-use Netlogix\XmlProcessor\NodeProcessor\CloseNodeProcessorInterface;
-use Netlogix\XmlProcessor\NodeProcessor\Context\CloseContext;
+use Generator;
+use stdClass;
+use XMLReader;
 use Netlogix\XmlProcessor\NodeProcessor\NodeProcessorInterface;
 use Netlogix\XmlProcessor\XmlProcessorContext;
 use PHPUnit\Framework\TestCase;
 
-class
-XmlProcessorContextTest extends TestCase
+class XmlProcessorContextTest extends TestCase
 {
     /** @var NodeProcessorInterface */
-    static private $processor;
+    private static $processor;
 
     function setUp(): void
     {
@@ -43,10 +44,10 @@ XmlProcessorContextTest extends TestCase
         $this->assertSame($expected, $context->getProcessor(NodeProcessorInterface::class));
     }
 
-    public static function getProcessorDataProvider(): \Generator
+    public static function getProcessorDataProvider(): Generator
     {
         yield [self::$processor, self::$processor];
-        yield [[], NULL];
+        yield [[], null];
     }
 
     /**
@@ -54,7 +55,7 @@ XmlProcessorContextTest extends TestCase
      */
     public function testSkipCurrentNode(bool $return): void
     {
-        $skipNodeMock = $this->getMockBuilder(\stdClass::class)->addMethods(['skipNode'])->getMock();
+        $skipNodeMock = $this->getMockBuilder(stdClass::class)->addMethods(['skipNode'])->getMock();
         $skipNodeMock->expects($this->atLeastOnce())->method('skipNode')->willReturn($return);
         $context = new XmlProcessorContext($this->getXMLReaderMock(), [], fn() => $skipNodeMock->skipNode());
         self::assertEquals($context->skipCurrentNode(), $return);
@@ -66,8 +67,8 @@ XmlProcessorContextTest extends TestCase
         yield [false];
     }
 
-    private function getXMLReaderMock(): \XMLReader
+    private function getXMLReaderMock(): XMLReader
     {
-        return $this->getMockBuilder(\XMLReader::class)->getMock();
+        return $this->getMockBuilder(XMLReader::class)->getMock();
     }
 }

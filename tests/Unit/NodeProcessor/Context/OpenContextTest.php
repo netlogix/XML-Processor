@@ -9,14 +9,11 @@ use PHPUnit\Framework\TestCase;
 class OpenContextTest extends TestCase
 {
     private function getOpenContext(
-        ?XmlProcessorContext $context = NULL,
+        ?XmlProcessorContext $context = null,
         array $nodePath = ['foo', 'bar']
-    ): OpenContext
-    {
+    ): OpenContext {
         return new OpenContext(
-            $context ?? $this->getMockBuilder(XmlProcessorContext::class)
-            ->disableOriginalConstructor()
-            ->getMock(),
+            $context ?? $this->getMockBuilder(XmlProcessorContext::class)->disableOriginalConstructor()->getMock(),
             $nodePath
         );
     }
@@ -40,5 +37,4 @@ class OpenContextTest extends TestCase
         $context->setAttributes(['foo' => 'bar']);
         self::assertEquals(['foo' => 'bar'], $context->getAttributes());
     }
-
 }

@@ -1,5 +1,6 @@
 <?php
-declare(strict_types=1);
+
+declare(strict_types = 1);
 
 namespace Netlogix\XmlProcessor\Tests\Unit\Behat\NodeProcessor;
 
@@ -9,7 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class TextNodeProcessorTest extends TestCase
 {
-
     function test__invoke(): void
     {
         $nodeProcessor = new TextNodeProcessor();
@@ -20,15 +20,11 @@ class TextNodeProcessorTest extends TestCase
     {
         $nodeProcessor = new TextNodeProcessor();
         $context = $this->getMockBuilder(TextContext::class)->disableOriginalConstructor()->getMock();
-        $context->method('getText')->willReturnOnConsecutiveCalls(
-            'foo',
-            'bar'
-        );
+        $context->method('getText')->willReturnOnConsecutiveCalls('foo', 'bar');
         $nodeProcessor->textElement($context);
         self::assertIsArray($nodeProcessor());
         self::assertEquals(['foo'], $nodeProcessor());
         $nodeProcessor->textElement($context);
         self::assertEquals(['foo', 'bar'], $nodeProcessor());
     }
-
 }
